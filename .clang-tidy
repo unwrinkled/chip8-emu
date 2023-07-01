@@ -1,0 +1,1 @@
+Checks: 'bugprone-*, concurrency-*, cppcoreguidelines-*, modernize-*, -modernize-use-trailing-return-type, readability-*, -readability-identifier-length, performance-*'
