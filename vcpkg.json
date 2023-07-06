@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "dependencies": [
+    "gtest",
+    "glfw3",
+    "ms-gsl",
+    {
+      "name": "glad",
+      "default-features": false,
+      "features": [
+        "gl-api-46"
+      ]
+    }
+  ]
+}

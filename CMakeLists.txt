@@ -1,21 +1,35 @@
-cmake_minimum_required(VERSION 3.26.3)
+cmake_minimum_required(VERSION 3.24)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_PREFIX_PATH "C:/Users/death/dev/tools/GLFW")
+file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
+if(EXISTS "${LOC_PATH}")
+    message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.")
+endif()
 
-project(chip8)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_COLOR_DIAGNOSTICS ON)
 
-find_package(glfw3 CONFIG REQUIRED)
-find_package(Microsoft.GSL CONFIG REQUIRED)
+set(GLAD_PROFILE core)
 
-add_library(glad STATIC glad/gl.c)
-target_include_directories(glad PUBLIC glad/include)
-
-add_executable(chip8 src/main.cpp
-  src/memory.h src/memory.cpp
+project(chip8
+  VERSION 0.1.0
+  DESCRIPTION "My attempt at writing a CHIP8 emulator"
 )
 
-target_compile_definitions(chip8 PRIVATE $<$<CONFIG:Debug>:CH_DEBUG>)
-target_compile_features(chip8 PRIVATE cxx_std_20)
-target_compile_options(chip8 PRIVATE $<IF:$<CXX_COMPILER_ID:MSVC>,,-Wall -Wextra>)
-target_link_libraries(chip8 PRIVATE glad glfw Microsoft.GSL::GSL)
+add_subdirectory(src lib)
+add_subdirectory(chip8 bin)
+
+set_target_properties(chip8_lib chip8
+  PROPERTIES EXPORT_COMPILE_COMMANDS YES
+  CXX_STANDARD_REQUIRED YES
+  CXX_EXTENSIONS NO
+)
+
+if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
+  option(PACKAGE_TESTS "Build the tests" ON)
+endif()
+
+if (PACKAGE_TESTS)
+  enable_testing()
+  include(GoogleTest)
+  add_subdirectory(tests)
+endif()

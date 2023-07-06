@@ -1,1 +1,31 @@
-Checks: 'bugprone-*, concurrency-*, cppcoreguidelines-*, modernize-*, -modernize-use-trailing-return-type, readability-*, -readability-identifier-length, performance-*'
+Checks: >
+  -*,
+  bugprone-*,
+  google-*,
+  modernize-*,
+  concurrency-*,
+  misc-*,
+  cppcoreguidelines-*,
+  readability-*,
+  performance-*,
+  portability-std-allocator-const,
+  -bugprone-easily-swappable-parameters,
+  -modernize-use-trailing-return-type,
+  -modernize-return-braced-init-list,
+  -readability-identifier-length,
+  -readability-redundant-declaration,
+  -readability-function-cognitive-complexity,
+	
+CheckOptions:
+  - { key: readability-identifier-naming.NamespaceCase,          value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.StructCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.TemplateParameterCase,  value: CamelCase  }
+  - { key: readability-identifier-naming.FunctionCase,           value: aNy_CasE   }
+  - { key: readability-identifier-naming.VariableCase,           value: lower_case }
+  - { key: readability-identifier-naming.ClassMemberCase,        value: lower_case }
+  - { key: readability-identifier-naming.ClassMemberPrefix,      value: m_         }
+  - { key: readability-identifier-naming.PrivateMemberPrefix,    value: m_         }
+  - { key: readability-identifier-naming.ProtectedMemberPrefix,  value: m_         }
+  - { key: readability-implicit-bool-conversion.AllowIntegerConditions,  value: 1  }
+  - { key: readability-implicit-bool-conversion.AllowPointerConditions,  value: 1  }
