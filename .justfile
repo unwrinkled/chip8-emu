@@ -30,7 +30,7 @@ exe := "chip8"
 
 # generate build files
 @generate: _create_build
-	cmake -S . -B build/ -G '{{generator}}' {{ if vcpkg != '' { '--toolchain ' + vcpkg } else {''} }}
+	cmake -Bbuild/ -G '{{generator}}' {{ if vcpkg != '' { '--toolchain ' + vcpkg } else {''} }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 	echo
 
 # create build folder if needed

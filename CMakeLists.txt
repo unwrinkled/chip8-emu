@@ -8,13 +8,14 @@ endif()
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_COLOR_DIAGNOSTICS ON)
 
-set(GLAD_PROFILE core)
+# set(GLAD_PROFILE core)
 
 project(chip8
   VERSION 0.1.0
   DESCRIPTION "My attempt at writing a CHIP8 emulator"
 )
 
+add_subdirectory(extern)
 add_subdirectory(src lib)
 add_subdirectory(chip8 bin)
 

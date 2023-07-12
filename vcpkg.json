@@ -4,12 +4,6 @@
     "gtest",
     "glfw3",
     "ms-gsl",
-    {
-      "name": "glad",
-      "default-features": false,
-      "features": [
-        "gl-api-46"
-      ]
-    }
+    "glm"
   ]
 }

@@ -15,6 +15,7 @@ Checks: >
   -readability-identifier-length,
   -readability-redundant-declaration,
   -readability-function-cognitive-complexity,
+  -readability-uppercase-literal-suffix
 	
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,          value: lower_case }

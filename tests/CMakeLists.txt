@@ -4,7 +4,7 @@ macro(package_add_test TESTNAME)
   add_executable(${TESTNAME} ${ARGN})
   target_link_libraries(${TESTNAME} PRIVATE GTest::gtest GTest::gtest_main chip8_lib)
   gtest_discover_tests(${TESTNAME}
-    WORKING_DIRECTORY ${PROJECT_DIR}
+    WORKING_DIRECTORY ${chip8_SOURCE_DIR}
   )
 endmacro()
 

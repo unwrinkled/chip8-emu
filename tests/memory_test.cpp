@@ -1,6 +1,11 @@
 #include <gtest/gtest.h>
 
-TEST(HelloTest, BasicAssertions) {
-    EXPECT_STRNE("hello", "world");
-    EXPECT_EQ(7 * 6, 42);
+#include <chip8/memory.h>
+
+TEST(MemoryTests, OpcodeFetching) {
+    Memory memory("roms/test_opcode.ch8");
+
+    constexpr u16 pc = 512;
+    Opcode opcode = memory.fetch(pc);
+    EXPECT_EQ(opcode, 0x124e);
 }

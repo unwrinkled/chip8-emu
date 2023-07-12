@@ -15,6 +15,9 @@
 class Opcode {
   public:
     Opcode(u8 b0, u8 b1);
+
+    bool operator==(const u16 &rhs) const;
+
     void print() const;
 
   private:
