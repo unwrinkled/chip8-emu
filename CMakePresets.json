@@ -1,0 +1,16 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "with-vcpkg",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    }
+  ],
+
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "with-vcpkg"
+    }
+  ]
+}

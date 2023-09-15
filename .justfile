@@ -1,9 +1,6 @@
 set windows-shell := ["nu", "-c"]
 
 config := "Debug"
-vcpkg := if env_var_or_default("VCPKG_ROOT", "") != "" { env_var("VCPKG_ROOT") / "scripts/buildsystems/vcpkg.cmake" } else { '' }
-generator := "Ninja Multi-Config"
-
 exe := "chip8"
 
 # run target
@@ -13,7 +10,7 @@ exe := "chip8"
 
 # build project
 @build build_type=config:
-	cmake --build build/ --config {{build_type}}
+	cmake --build build/ --preset {{lowercase(build_type)}}
 	echo
 	
 # install project
@@ -30,7 +27,7 @@ exe := "chip8"
 
 # generate build files
 @generate: _create_build
-	cmake -Bbuild/ -G '{{generator}}' {{ if vcpkg != '' { '--toolchain ' + vcpkg } else {''} }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+	cmake -Bbuild/ --preset default -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 	echo
 
 # create build folder if needed
