@@ -26,7 +26,7 @@ set_target_properties(chip8_lib chip8
 )
 
 if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
-  option(PACKAGE_TESTS "Build the tests" ON)
+  option(PACKAGE_TESTS "Build tests" ON)
 endif()
 
 if (PACKAGE_TESTS)

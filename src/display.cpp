@@ -1,5 +1,6 @@
-#include <chip8/display.h>
+#include "display.h"
 
+#include <GLFW/glfw3.h>
 #include <gsl/gsl_assert>
 
 #include <glm/ext/matrix_transform.hpp>
@@ -12,18 +13,84 @@
 #include <format>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
 namespace fs = std::filesystem;
 
+namespace {
+enum class Chip8Key : u8 {
+    Key0 = 0x0,
+    Key1 = 0x1,
+    Key2 = 0x2,
+    Key3 = 0x3,
+    Key4 = 0x4,
+    Key5 = 0x5,
+    Key6 = 0x6,
+    Key7 = 0x7,
+    Key8 = 0x8,
+    Key9 = 0x9,
+    KeyA = 0xa,
+    KeyB = 0xb,
+    KeyC = 0xc,
+    KeyD = 0xd,
+    KeyE = 0xe,
+    KeyF = 0xf
+};
+
+void process_keys(GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
+    static std::map<int, Chip8Key> key_map{
+        { GLFW_KEY_1, Chip8Key::Key1 },
+        { GLFW_KEY_2, Chip8Key::Key2 },
+        { GLFW_KEY_3, Chip8Key::Key3 },
+        { GLFW_KEY_4, Chip8Key::KeyC },
+        { GLFW_KEY_Q, Chip8Key::Key4 },
+        { GLFW_KEY_W, Chip8Key::Key5 },
+        { GLFW_KEY_E, Chip8Key::Key6 },
+        { GLFW_KEY_R, Chip8Key::KeyD },
+        { GLFW_KEY_A, Chip8Key::Key7 },
+        { GLFW_KEY_S, Chip8Key::Key8 },
+        { GLFW_KEY_D, Chip8Key::Key9 },
+        { GLFW_KEY_F, Chip8Key::KeyE },
+        { GLFW_KEY_Z, Chip8Key::KeyA },
+        { GLFW_KEY_X, Chip8Key::Key0 },
+        { GLFW_KEY_C, Chip8Key::KeyB },
+        { GLFW_KEY_V, Chip8Key::KeyF }
+    };
+
+    auto &display = *static_cast<Display *>(glfwGetWindowUserPointer(window));
+
+    if (key_map.contains(key) && (action == GLFW_PRESS || action == GLFW_RELEASE)) {
+        // if (action == GLFW_PRESS) {
+        //     std::cout << std::format("PRESSED {:#x}\n", static_cast<u8>(key_map.at(key)));
+        // } else if (action == GLFW_RELEASE) {
+        //     std::cout << std::format("RELEASED {:#x}\n", static_cast<u8>(key_map.at(key)));
+        // }
+
+        display.toggle_key(static_cast<u8>(key_map.at(key)));
+    } else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
+
 void terminate_glfw(GLFWwindow *window) {
     glfwDestroyWindow(window);
     glfwTerminate();
 }
 
-Display::Display() : m_window(nullptr, terminate_glfw), m_shader(0), m_pixel_vao(0), m_vbo(0), m_ebo(0), m_model_loc(0) {
+void message_callback([[maybe_unused]] GLenum source, GLenum type,
+                      [[maybe_unused]] GLuint id,
+                      GLenum severity, [[maybe_unused]] GLsizei length,
+                      const GLchar *msg, [[maybe_unused]] const void *user_param) noexcept {
+    std::cerr << std::format("GL CALLBACK: {} type = {:#x}, severity = {:#x}, message = {}\n",
+                             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+                             type, severity, msg);
+}
+} // namespace
+
+Display::Display() : m_window(nullptr, terminate_glfw), m_shader(0), m_pixel_vao(0), m_vbo(0), m_ebo(0), m_model_loc(0), m_color_loc(0), m_display{ { { 0 } } }, m_keys_pressed{ false } {
     if (!glfwInit()) {
         throw std::runtime_error("There was a problem with glfw");
     }
@@ -32,6 +99,7 @@ Display::Display() : m_window(nullptr, terminate_glfw), m_shader(0), m_pixel_vao
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, gl_version_minor);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
 
     m_window = GLFWwindow_smart(glfwCreateWindow(window_width, window_height, "CHIP8 Emulator", nullptr, nullptr), terminate_glfw);
     if (!m_window) {
@@ -41,10 +109,13 @@ Display::Display() : m_window(nullptr, terminate_glfw), m_shader(0), m_pixel_vao
 
     glfwMakeContextCurrent(m_window.get());
     int version = gladLoadGL(glfwGetProcAddress);
-    std::cout << "OpenGL Version: " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << "\n";
+    std::cout << std::format("OpenGL Version: {}.{}\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+
+    glfwSetWindowUserPointer(m_window.get(), this);
+    glfwSetKeyCallback(m_window.get(), process_keys);
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(Display::message_callback, nullptr);
+    glDebugMessageCallback(message_callback, nullptr);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -53,6 +124,7 @@ Display::Display() : m_window(nullptr, terminate_glfw), m_shader(0), m_pixel_vao
 
     glUseProgram(m_shader);
     m_model_loc = glGetUniformLocation(m_shader, "model");
+    m_color_loc = glGetUniformLocation(m_shader, "color");
 
     glBindVertexArray(m_pixel_vao);
 }
@@ -84,8 +156,6 @@ void Display::load_shaders() {
         std::string info_log;
         info_log.reserve(log_size);
         glGetShaderInfoLog(vertex_shader, log_size, nullptr, info_log.data());
-        // std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-        //           << info_log << std::endl;
         throw std::runtime_error(std::format("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", info_log));
     }
 
@@ -105,8 +175,6 @@ void Display::load_shaders() {
         std::string info_log;
         info_log.reserve(log_size);
         glGetShaderInfoLog(fragment_shader, log_size, nullptr, info_log.data());
-        // std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-        //           << info_log << std::endl;
         throw std::runtime_error(std::format("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n{}", info_log));
     }
 
@@ -121,8 +189,6 @@ void Display::load_shaders() {
         std::string info_log;
         info_log.reserve(log_size);
         glGetProgramInfoLog(m_shader, log_size, nullptr, info_log.data());
-        // std::cerr << "ERROR::SHADER::LINK_FAILED\n"
-        //           << info_log << std::endl;
         throw std::runtime_error(std::format("ERROR::SHADER::LINK_FAILED\n{}", info_log));
     }
 
@@ -162,17 +228,55 @@ void Display::create_pixel_vao() noexcept {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Display::clear_screen() const noexcept {
+void Display::clear_screen() noexcept {
     Expects(m_window);
+    for (auto &row : m_display) {
+        row.fill(0);
+    }
     glClear(GL_COLOR_BUFFER_BIT);
 }
+
+bool Display::draw_sprite(std::vector<u8> &&sprite, u8 x, u8 y) noexcept {
+    constexpr u8 byte_in_bits = 8;
+    x %= chip8_width;
+    y %= chip8_height;
+
+    u8 n = sprite.size();
+    u8 current_sprite = 0;
+    bool has_flipped = false;
+    for (u8 i = 0; i < n && y + i < chip8_height; ++i) {
+        current_sprite = sprite.at(i);
+        for (u8 j = 0; j < byte_in_bits && x + j < chip8_width; ++j) {
+            u8 set = current_sprite >> (byte_in_bits - 1 - j) & 1;
+            if (set) {
+                if (m_display.at(y + i).at(x + j) == 1) {
+                    draw_pixel(x + j, y + i, false);
+                    m_display.at(y + i).at(x + j) = 0;
+                    has_flipped = true;
+                } else {
+                    draw_pixel(x + j, y + i, true);
+                    m_display.at(y + i).at(x + j) = 1;
+                }
+            }
+        }
+    }
+
+    return has_flipped;
+}
+
 // -1 + w * 0.5 + x * w = -1 + w(x + 0.5)
-void Display::draw_pixel(const u16 x, const u16 y) const noexcept {
+void Display::draw_pixel(const u16 x, const u16 y, bool is_colored) const noexcept {
     auto pos_x = -1.0f + pixel_width * (static_cast<float>(x) * 2 + 1);
     auto pos_y = 1.0f - pixel_height * (static_cast<float>(y) * 2 + 1);
     auto model = glm::translate(glm::mat4(1.0f), glm::vec3(pos_x, pos_y, 0.0f));
     model = glm::scale(model, glm::vec3(pixel_width, pixel_height, 0.0f));
     glUniformMatrix4fv(m_model_loc, 1, GL_FALSE, glm::value_ptr(model));
+
+    if (!is_colored) {
+        glUniform3fv(m_color_loc, 1, glm::value_ptr(m_black_color));
+    } else {
+        glUniform3fv(m_color_loc, 1, glm::value_ptr(m_white_color));
+    }
 
     glDrawElements(GL_TRIANGLES, m_num_of_indices, GL_UNSIGNED_INT, nullptr);
 }
@@ -184,7 +288,8 @@ bool Display::should_close() const noexcept {
 
 void Display::swap_buffers() const noexcept {
     Expects(m_window);
-    glfwSwapBuffers(m_window.get());
+    // glfwSwapBuffers(m_window.get());
+    glFlush();
 }
 
 void Display::poll_events() const noexcept {
@@ -192,11 +297,10 @@ void Display::poll_events() const noexcept {
     glfwPollEvents();
 }
 
-void Display::message_callback([[maybe_unused]] GLenum source, GLenum type,
-                               [[maybe_unused]] GLuint id,
-                               GLenum severity, [[maybe_unused]] GLsizei length,
-                               const GLchar *msg, [[maybe_unused]] const void *user_param) noexcept {
-    std::cerr << std::format("GL CALLBACK: {} type = {:#x}, severity = {:#x}, message = {}\n",
-                             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-                             type, severity, msg);
+void Display::toggle_key(u8 key) noexcept {
+    m_keys_pressed.at(key) = !m_keys_pressed.at(key);
+}
+
+bool Display::is_pressed(u8 key) const noexcept {
+    return m_keys_pressed.at(key);
 }

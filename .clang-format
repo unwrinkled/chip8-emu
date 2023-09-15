@@ -117,7 +117,7 @@ Cpp11BracedListStyle: false
 #IncludeIsMainSourceRegex: ''
 #IndentAccessModifiers: false
 #IndentCaseBlocks: false
-#IndentCaseLabels: false
+IndentCaseLabels: true
 #IndentExternBlock: AfterExternBlock
 #IndentGotoLabels: true
 #IndentPPDirectives: None

@@ -3,11 +3,13 @@ find_package(Microsoft.GSL CONFIG REQUIRED)
 
 set(H_FILE_LOC ${PROJECT_SOURCE_DIR}/include/chip8)
 add_library(chip8_lib STATIC
-  ${H_FILE_LOC}/common.h 
-  ${H_FILE_LOC}/memory.h 
-  memory.cpp
-  ${H_FILE_LOC}/display.h
+  common.h 
+  ram.h 
+  ram.cpp
+  display.h
   display.cpp
+  chip8.cpp
+  ${H_FILE_LOC}/chip8.h
 )
 
 target_compile_definitions(chip8_lib PUBLIC $<$<CONFIG:Debug>:CH_DEBUG>)
