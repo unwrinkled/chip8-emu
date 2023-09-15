@@ -63,12 +63,6 @@ void process_keys(GLFWwindow *window, int key, [[maybe_unused]] int scancode, in
     auto &display = *static_cast<Display *>(glfwGetWindowUserPointer(window));
 
     if (key_map.contains(key) && (action == GLFW_PRESS || action == GLFW_RELEASE)) {
-        // if (action == GLFW_PRESS) {
-        //     std::cout << std::format("PRESSED {:#x}\n", static_cast<u8>(key_map.at(key)));
-        // } else if (action == GLFW_RELEASE) {
-        //     std::cout << std::format("RELEASED {:#x}\n", static_cast<u8>(key_map.at(key)));
-        // }
-
         display.toggle_key(static_cast<u8>(key_map.at(key)));
     } else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
