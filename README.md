@@ -2,21 +2,37 @@
 
 My take on the emulation of programs written in the CHIP-8 interpreted language for COSMAC VIP systems.
 
-## Usage
-
-You will need to find some CHIP-8 roms on the internet. Then just run:
-
-```pwsh
-./build/bin/Release/chip8.exe ROM_Path
-```
-
 ## Installation
 
 ### Requirements
 
- You will need to download and install [vcpkg](https://vcpkg.io/en/) and [CMake](https://cmake.org/).
+You will need to download and install [vcpkg](https://vcpkg.io/en/) for
+dependency management and [CMake](https://cmake.org/) for building the
+project.
 
-TODO
+First create the build folder and then generate the build files:
+
+```bash
+mkdir build
+cmake --preset default
+```
+
+Then build the executable:
+
+```bash
+cmake --build --preset default
+```
+
+The binary file can be found at `build/bin/Release` by the name `chip8`
+
+## Usage
+
+You will need to find some CHIP-8 roms on the internet. Some testing roms
+can be found in the roms folder. Then just run:
+
+```bash
+path/to/chip8.exe rom_path
+```
 
 ## LICENSE
 

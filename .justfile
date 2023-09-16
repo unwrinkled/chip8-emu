@@ -10,7 +10,7 @@ exe := "chip8"
 
 # build project
 @build build_type=config:
-	cmake --build build/ --preset {{lowercase(build_type)}}
+	cmake --build --preset {{lowercase(build_type)}}
 	echo
 	
 # install project
@@ -22,13 +22,13 @@ exe := "chip8"
 	ctest --test-dir build
 	echo
 
-@clean:
-	rm -rf build/
-
 # generate build files
 @generate: _create_build
-	cmake -Bbuild/ --preset default -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-	echo
+  cmake --preset ninja
+  echo
+
+@clean:
+	rm -rf build/
 
 # create build folder if needed
 @_create_build:

@@ -2,7 +2,8 @@
   "version": 4,
   "configurePresets": [
     {
-      "name": "with-vcpkg",
+      "name": "default",
+      "binaryDir": "build",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     }
   ],
@@ -10,7 +11,8 @@
   "buildPresets": [
     {
       "name": "default",
-      "configurePreset": "with-vcpkg"
+      "configurePreset": "default",
+      "configuration": "Release"
     }
   ]
 }
