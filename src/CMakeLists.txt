@@ -8,6 +8,12 @@ add_library(chip8_lib STATIC
   ram.cpp
   display.h
   display.cpp
+  cpu.h
+  cpu.cpp
+  registers.h
+  registers.cpp
+  commands.h
+  commands.cpp
   chip8.cpp
   ${H_FILE_LOC}/chip8.h
 )

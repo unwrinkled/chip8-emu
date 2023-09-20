@@ -3,7 +3,6 @@
 
 #include "common.h"
 
-#include <gsl/assert>
 #include <gsl/gsl>
 
 #include <algorithm>
@@ -15,29 +14,89 @@
 #include <iterator>
 #include <vector>
 
+enum class Operation : u8 {
+    ClearReturn = 0x0,
+    Jump = 0x1,
+    Call = 0x2,
+    IfRegNotEqualValue = 0x3,
+    IfRegEqualValue = 0x4,
+    IfRegNotEqualReg = 0x5,
+    SetRegValue = 0x6,
+    AddToReg = 0x7,
+    RegOperations = 0x8,
+    IfRegEquality = 0x9,
+    SetIndex = 0xa,
+    JumpV0Addr = 0xb,
+    RandomNumber = 0xc,
+    LoadSprite = 0xd,
+    KeyPress = 0xe,
+    Other = 0xf
+};
+
+enum class ClearReturn : u16 {
+    Clear = 0xe0,
+    Return = 0xee,
+};
+
+enum class RegOperation : u8 {
+    Set = 0x0,
+    BitwiseOr = 0x1,
+    BitwiseAnd = 0x2,
+    BitwiseXor = 0x3,
+    Addition = 0x4,
+    Subtraction = 0x5,
+    ShiftRight = 0x6,
+    AltSubtraction = 0x7,
+    ShiftLeft = 0xe,
+};
+
+enum class KeyPressOp : u16 {
+    IfKeyNotPressed = 0x9e,
+    IfKeyPressed = 0xa1,
+};
+
+enum class OtherOp : u16 {
+    SetVxDelay = 0x07,
+    SetVxKey = 0x0a,
+    SetDelay = 0x15,
+    SetBuzzer = 0x18,
+    AddVxToIndex = 0x1e,
+    SetIndexToHex = 0x29,
+    BcdVx = 0x33,
+    StoreToRam = 0x55,
+    LoadFromRam = 0x65,
+};
+
 class Opcode {
   public:
     explicit Opcode(u16 op);
 
-    Opcode &operator=(u16 op) {
-        m_opcode = op;
-        return *this;
-    }
+    Opcode &operator=(u16 op);
 
+    // get 4 bits starting from position pos.
     // pos is from right to left starting from 0
     [[nodiscard]] inline u8 get_nibble(u8 pos) const noexcept {
         Expects(pos >= 0 && pos <= 3);
         return m_opcode >> (pos * m_nibble) & m_nibble_mask;
     }
 
+    // get the least significant byte (pos = 0) or
+    // most significant byte (pos = 1)
     [[nodiscard]] inline u8 get_byte(u8 pos) const noexcept {
         Expects(pos == 0 || pos == 1);
         return m_opcode >> (pos * m_byte) & m_byte_mask;
     }
 
+    // get lower 12 bits
     [[nodiscard]] inline u16 get_12bits() const noexcept {
         return (static_cast<u16>(get_nibble(2)) << m_byte) | get_byte(0);
     }
+
+    // get operation type by checking most significant 4 bits
+    [[nodiscard]] inline Operation get_operation_type() const noexcept {
+        return static_cast<Operation>(get_nibble(3));
+    }
+
     void print() const noexcept;
 
   private:
@@ -124,7 +183,7 @@ class RAM {
         m_data.at(i + 2) = vx % base10;
     }
 
-    void store(u16 i, u8 vx, gsl::span<u8> &&regs) noexcept {
+    void store(u16 i, u8 vx, const gsl::span<u8> &&regs) noexcept {
         Expects(i + vx <= N);
         std::copy(gsl::begin(regs), std::next(gsl::begin(regs), vx + 1), std::next(m_data.begin(), i));
     }

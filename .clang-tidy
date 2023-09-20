@@ -1,31 +1,18 @@
 ---
-# Checks: >
-#   -*,
-#   bugprone-*,
-#   google-*,
-#   modernize-*,
-#   concurrency-*,
-#   misc-*,
-#   cppcoreguidelines-*,
-#   readability-*,
-#   performance-*,
-#   portability-std-allocator-const,
-#   -bugprone-easily-swappable-parameters,
-#   -modernize-use-trailing-return-type,
-#   -modernize-return-braced-init-list,
-#   -readability-identifier-length,
-#   -readability-redundant-declaration,
-#   -readability-function-cognitive-complexity,
-#   -readability-uppercase-literal-suffix
 Checks: >
   *,
+  -altera-*,
+  -android-*,
   -fuchsia-*,
   -google-*,
+  -hicpp-*,
   -zircon-*,
   -abseil-*,
   -modernize-use-trailing-return-type,
   -llvm-*,
-  -llvmlibc-*
+  -llvmlibc-*,
+  -readability-uppercase-literal-suffix,
+  -readability-identifier-length
 	
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,          value: lower_case }
@@ -42,6 +29,6 @@ CheckOptions:
   - { key: readability-implicit-bool-conversion.AllowPointerConditions,  value: 1  }
   - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
 
-WarningAsErrors: '*'
+WarningsAsErrors: '*'
 FormatStyle: file
 ...

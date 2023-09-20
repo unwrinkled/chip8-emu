@@ -8,7 +8,8 @@ My take on the emulation of programs written in the CHIP-8 interpreted language 
 
 You will need to download and install [vcpkg](https://vcpkg.io/en/) for
 dependency management and [CMake](https://cmake.org/) for building the
-project.
+project. Also, be sure to set the VCPKG_ROOT environment variable to the
+root of your vcpkg installation.
 
 First create the build folder and then generate the build files:
 
