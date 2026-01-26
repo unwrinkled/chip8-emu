@@ -1,7 +1,7 @@
 #include "display.h"
 
 #include <GLFW/glfw3.h>
-#include <gsl/gsl_assert>
+#include <gsl/assert>
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

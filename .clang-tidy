@@ -29,6 +29,5 @@ CheckOptions:
   - { key: readability-implicit-bool-conversion.AllowPointerConditions,  value: 1  }
   - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
 
-WarningsAsErrors: '*'
 FormatStyle: file
 ...

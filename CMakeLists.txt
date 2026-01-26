@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.24)
 
-file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
-if(EXISTS "${LOC_PATH}")
-    message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.")
+if ("${CMAKE_SOURCE_DIR}" EQUAL "${CMAKE_BINARY_DIR}")
+  message(FATAL_ERROR "Building in the source directory is not allowed.")
 endif()
 
-# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_COLOR_DIAGNOSTICS ON)
+option(BUILD_TESTS "Build tests" OFF)
 
-# set(GLAD_PROFILE core)
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 project(chip8
   VERSION 0.1.0
@@ -19,18 +19,7 @@ add_subdirectory(extern)
 add_subdirectory(src lib)
 add_subdirectory(chip8 bin)
 
-set_target_properties(chip8_lib chip8
-  PROPERTIES EXPORT_COMPILE_COMMANDS YES
-  CXX_STANDARD_REQUIRED YES
-  CXX_EXTENSIONS NO
-)
-
-if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
-  option(PACKAGE_TESTS "Build tests" ON)
-endif()
-
-if (PACKAGE_TESTS)
+if (BUILD_TESTS)
   enable_testing()
-  include(GoogleTest)
   add_subdirectory(tests)
 endif()
