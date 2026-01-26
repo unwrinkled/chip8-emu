@@ -6,7 +6,7 @@ exe := "chip8"
 # run target
 [no-exit-message]
 @run args="":
-	./build/bin/{{exe}} {{args}}
+	./build/src/{{exe}} {{args}}
 
 # build project
 @build build_type=config:

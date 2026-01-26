@@ -16,8 +16,7 @@ project(chip8
 )
 
 add_subdirectory(extern)
-add_subdirectory(src lib)
-add_subdirectory(chip8 bin)
+add_subdirectory(src)
 
 if (BUILD_TESTS)
   enable_testing()
