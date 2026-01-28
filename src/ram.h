@@ -154,8 +154,7 @@ class RAM {
 
     [[nodiscard]] inline Opcode fetch(u16 pc) const noexcept {
         Expects(pc >= 0 && pc + 1 < N);
-        // NOLINTNEXTLINE(*magic-numbers*): 8 bits
-        return Opcode{ (static_cast<u16>(m_data.at(pc)) << 8) | static_cast<u16>(m_data.at(pc + 1)) };
+        return Opcode{ static_cast<u16>(m_data.at(pc) << 8 | m_data.at(pc + 1)) };
     }
 
     [[nodiscard]] inline std::vector<u8> get_sprite(u16 i, u8 n) const noexcept {
