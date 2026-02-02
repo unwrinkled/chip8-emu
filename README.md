@@ -1,38 +1,42 @@
 # CHIP-8 Emulator
 
-My take on the emulation of programs written in the CHIP-8 interpreted language for COSMAC VIP systems.
+My take on building a CHIP-8 emulator.
 
 ## Installation
 
 ### Requirements
 
-You will need to download and install [vcpkg](https://vcpkg.io/en/) for
-dependency management and [CMake](https://cmake.org/) for building the
-project. Also, be sure to set the VCPKG_ROOT environment variable to the
-root of your vcpkg installation.
+You will need a C compiler, and [CMake](https://cmake.org/) to build the project.
 
-First create the build folder and then generate the build files:
+First create the build folder and generate the build files:
 
 ```bash
 mkdir build
-cmake --preset default
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
 Then build the executable:
 
 ```bash
-cmake --build --preset default
+cmake --build build
 ```
 
-The binary file can be found at `build/bin/Release` by the name `chip8`
+Finally, install the binary together with some sample roms:
+
+```bash
+cmake --install build --prefix out
+```
+
+The binary file will be located at `out/bin/chip8`.
 
 ## Usage
 
-You will need to find some CHIP-8 roms on the internet. Some testing roms
-can be found in the roms folder. Then just run:
+You will need to find some CHIP-8 roms on the internet, but you can also test it
+with the roms that are installed together with the binary. For example, you can
+invoke the executable like so:
 
 ```bash
-path/to/chip8.exe rom_path
+./out/bin/chip8 ./out/roms/IBM_Logo.ch8
 ```
 
 ## LICENSE
