@@ -28,3 +28,5 @@ target_link_libraries(chip8_lib PUBLIC glad glfw Microsoft.GSL::GSL glm::glm)
 target_include_directories(chip8_lib PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 add_executable(chip8 chip8.cpp)
 target_link_libraries(chip8 PRIVATE chip8_lib)
+
+install(TARGETS chip8)

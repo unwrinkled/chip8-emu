@@ -9,7 +9,7 @@ exe := "chip8"
 	./build/src/{{exe}} {{args}}
 
 # build project
-@build build_type=config:
+@build:
 	cmake --build build
 	echo
 	
@@ -18,8 +18,12 @@ exe := "chip8"
 	echo
 
 # generate build files
-@generate: _create_build
-	cmake -B build -G Ninja
+@generate config="Debug": _create_build
+	cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE={{ config }}
+	echo
+
+@install:
+	cmake --install build --prefix out
 	echo
 
 @clean:

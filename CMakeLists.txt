@@ -19,6 +19,8 @@ add_subdirectory(extern)
 add_subdirectory(tools)
 add_subdirectory(src)
 
+install(DIRECTORY roms/ DESTINATION roms)
+
 if (BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
