@@ -16,6 +16,7 @@ project(chip8
 )
 
 add_subdirectory(extern)
+add_subdirectory(tools)
 add_subdirectory(src)
 
 if (BUILD_TESTS)
