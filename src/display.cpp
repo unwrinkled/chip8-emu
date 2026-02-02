@@ -1,5 +1,8 @@
 #include "display.h"
 
+#include <fragment_shader.h>
+#include <vertex_shader.h>
+
 #include <GLFW/glfw3.h>
 #include <gsl/assert>
 
@@ -131,16 +134,10 @@ Display::~Display() {
 }
 
 void Display::load_shaders() {
-    auto shaders_path = fs::path("shaders");
-
-    std::ifstream vertex_file(shaders_path / "vertex.vert");
-    std::stringstream vertex_stream;
-    vertex_stream << vertex_file.rdbuf();
-    std::string v_str = vertex_stream.str();
-    const char *vertex_source = v_str.c_str();
-
+    const char *src = reinterpret_cast<char *>(vertex_shader_bytes);
+    GLint src_size = sizeof(vertex_shader_bytes);
     unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_source, nullptr);
+    glShaderSource(vertex_shader, 1, &src, &src_size);
     glCompileShader(vertex_shader);
 
     int success = 0;
@@ -153,14 +150,10 @@ void Display::load_shaders() {
         throw std::runtime_error(std::format("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", info_log));
     }
 
-    std::ifstream fragment_file(shaders_path / "fragment.frag");
-    std::stringstream fragment_stream;
-    fragment_stream << fragment_file.rdbuf();
-    std::string f_str = fragment_stream.str();
-    const char *fragment_source = f_str.c_str();
-
+    src = reinterpret_cast<char *>(fragment_shader_bytes);
+    src_size = sizeof(fragment_shader_bytes);
     unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_source, nullptr);
+    glShaderSource(fragment_shader, 1, &src, &src_size);
     glCompileShader(fragment_shader);
 
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
