@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 project(chip8
-  VERSION 0.1.0
+  VERSION 1.0.0
   DESCRIPTION "My attempt at writing a CHIP8 emulator"
 )
 
